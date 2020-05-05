@@ -4,5 +4,5 @@
 ## 卡片动画
 ![Alt Text](card animation.gif)
 
-## 卡片动画
+## 输入框联想
 ![Alt Text](search suggestion.gif)
