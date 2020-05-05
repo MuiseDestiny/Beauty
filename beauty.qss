@@ -1,0 +1,101 @@
+QWidget#win {
+    background-color: #f1f3f4;
+}
+.MyFrame#frame_box {
+    border: 5px solid white;
+    background-color:
+    qlineargradient(
+    spread:pad,
+    x1:0,y1:1,
+    x2:0,y2:0,
+    stop:0 rgb(254,170,84),
+    stop:0.8 rgb(255,95,60)
+    stop:1 rgb(255,95,60)
+    );
+    color: white;
+    border-radius: 20px;
+}
+.MyFrame#frame_box:hover {
+    border: 0px solid white;
+}
+.QFrame#mask:hover {
+    border-radius: 20px;
+    background: url(pngs/mark.png);
+}
+QLabel {
+    font-family: 微软雅黑;
+    color: white;
+}
+QLabel#bottom {
+    border: 5px solid white;
+    background-color: #fafafa;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+QLineEdit {
+    background-color: white;
+    border-radius: 15px;
+    border:2px solid gray;
+}
+QScrollArea {
+    background: #f1f3f4;
+    border: 0px;
+    background-attachment: scroll;
+}
+QScrollBar:horizontal {
+    background: #f1f3f4;
+    height: 20px;
+    margin: 0 0 0 0;
+}
+QScrollBar::handle:horizontal {
+    background: grey;
+    min-width: 10px;
+    border: 5px solid #f1f3f4;
+    border-radius: 10px;
+    background-attachment: fixed;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #5ACEBE;
+}
+QScrollBar::add-line:horizontal {
+    background: url(pngs/next_gray.png);
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+    background: url(pngs/last_gray.png);
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+QScrollBar::add-line:horizontal:hover {
+    background: url(pngs/next.png);
+}
+QScrollBar::sub-line:horizontal:hover {
+    background: url(pngs/last.png);
+}
+QPushButton#Left {
+    background: url(pngs/left.png);
+    border: 0px;
+    width: 30px;
+    height: 30px;
+}
+QPushButton#Right {
+    background: url(pngs/right.png);
+    border: 0px;
+    width: 30px;
+    height: 30px;
+}
+QPushButton#Right:hover {
+    background: url(pngs/right_hover.png);
+}
+QPushButton#Right:pressed {
+    background: url(pngs/right_click.png);
+}
+QPushButton#Left:hover {
+    background: url(pngs/left_hover.png);
+}
+QPushButton#Left:pressed {
+    background: url(pngs/left_click.png);
+}
