@@ -424,7 +424,6 @@ class Beauty(QWidget):
         """
         天气获取，用正则，也可用xpath，没必要
         """
-        print(self.current_weather_api)
         self.current_weather_api = 'http://www.weather.com.cn/weather/101120906.shtml'
         r = requests.get(self.current_weather_api)
         r.encoding= 'utf-8'
@@ -434,11 +433,10 @@ class Beauty(QWidget):
             wea_dict = {}
             wea_dict['day'] = wea[0]
             wea_dict['weather'] = wea[1]
-            wea_dict['temperate'] = '℃ to '.join(re.findall('(\d{1,2}℃*)', wea[2]))
+            wea_dict['temperate'] = ' to '.join(re.findall('\d{1,2}℃', wea[2]))
             wea_dict['wind'] = re.findall('title="(.{,6})"', wea[3])
             wea_dict['wind_info'] = wea[4]
             wea_list.append(wea_dict)
-        print(wea_list)
         self.weather_list = wea_list
 
     def suggestion_location(self):
