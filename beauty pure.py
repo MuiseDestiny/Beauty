@@ -192,7 +192,7 @@ class Beauty(QWidget):
     update_pic = None
     anim_thread_dict = {}
     anim_thread = None
-    animation_params = dict.fromkeys([str(i) for i in range(7)])
+    params = dict.fromkeys([str(i) for i in range(7)])
     number_key = None
     timer = None
     suggest_api = 'http://toy1.weather.com.cn/search?cityname='
@@ -242,10 +242,10 @@ class Beauty(QWidget):
         """
         初始化窗体界面，搜索框，下面的区域
         """
-        for key in self.animation_params.keys():
-            self.animation_params[key] = {
+        for key in self.params.keys():
+            self.params[key] = {
                 'class': None,
-                'op': None
+                'style': None
             }
         self.title.setText("<font color=#fa744f style='font-size: 40px;font-weight: bold;'>W</font>"
                            "<font color=#16817a style='font-size: 40px;font-weight: bold;'>e</font>"
@@ -301,12 +301,10 @@ class Beauty(QWidget):
         try:
             filename = obj.property('number')
             self.update_pic = UpdatePic(filename)
-            self.update_pic.download_finish.connect(lambda: obj.setStyleSheet(".MyFrame[number='{}']:hover"
-                                                 "{{background: url('pngs/{}.jpg');}}".format(filename, filename)))
-            obj.setStyleSheet(".MyFrame[number='{}']:hover"
-                              "{{background: url('pngs/透明.png');}}".format(filename))
+            self.update_pic.download_finish.connect(lambda: obj.setStyleSheet(""".MyFrame[number='{}']:hover
+            {{background: url('pngs/{}.jpg');}}
+            {}""".format(filename, filename, self.params[filename]['style'])))
             self.update_pic.start()
-            QApplication.processEvents()
         except Exception as e:
             print('When Beauty changed the picture, ' + str(e))
 
@@ -399,13 +397,14 @@ class Beauty(QWidget):
         box, low_tem, high_tem = self.init_weather(frame, frame_mask)
         frame_mask.setLayout(box)
         fore_style = """.MyFrame#frame_box:hover {{background: url('pngs/{}.jpg');}}
-                            .MyFrame#frame_box {{background-color: qlineargradient(spread:pad,
-                            x1:0,y1:0,x2:0,y2:1,
-                            stop:0 rgb{},
-                            stop:0.6 rgb{},
-                            stop:1 rgb{});}}""".format(self.next_index + 1,
-                            self.tem_to_color(low_tem), self.tem_to_color(high_tem),
-                            self.tem_to_color(high_tem))
+                        .MyFrame#frame_box {{background-color: qlineargradient(spread:pad,
+                        x1:0,y1:0,x2:0,y2:1,
+                        stop:0 rgb{},
+                        stop:0.6 rgb{},
+                        stop:1 rgb{});}}""".format(self.next_index + 1,
+                        self.tem_to_color(low_tem), self.tem_to_color(high_tem),
+                        self.tem_to_color(high_tem))
+        self.params[str(self.next_index)]['style'] = fore_style
         frame.setStyleSheet(fore_style)
         return frame
 
@@ -491,16 +490,16 @@ class Beauty(QWidget):
         进入frame出发，上浮动画，阴影渐变动画
         """
         i = obj.property('number')
-        self.animation_params[i]['class'] = SeriesAnimation(obj, True, 20, 5, self, i)
-        self.animation_params[obj.property('number')]['class'].start()
+        self.params[i]['class'] = SeriesAnimation(obj, True, 20, 5, self, i)
+        self.params[obj.property('number')]['class'].start()
 
     def leave_anim(self, obj):
         """
         鼠标离开事件
         """
         i = obj.property('number')
-        self.animation_params[i]['class'] = SeriesAnimation(obj, False, 20, 5, self, i)
-        self.animation_params[obj.property('number')]['class'].start()
+        self.params[i]['class'] = SeriesAnimation(obj, False, 20, 5, self, i)
+        self.params[obj.property('number')]['class'].start()
 
     @staticmethod
     def add_click(obj):

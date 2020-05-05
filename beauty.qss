@@ -3,15 +3,6 @@ QWidget#win {
 }
 .MyFrame#frame_box {
     border: 5px solid white;
-    background-color:
-    qlineargradient(
-    spread:pad,
-    x1:0,y1:1,
-    x2:0,y2:0,
-    stop:0 rgb(254,170,84),
-    stop:0.8 rgb(255,95,60)
-    stop:1 rgb(255,95,60)
-    );
     color: white;
     border-radius: 20px;
 }
