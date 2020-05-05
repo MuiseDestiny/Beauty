@@ -425,9 +425,8 @@ class Beauty(QWidget):
         天气获取，用正则，也可用xpath，没必要
         """
         print(self.current_weather_api)
-        r = requests.get(self.current_weather_api, headers={
-        # 'Host': 'www.weather.com.cn',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'})
+        self.current_weather_api = 'http://www.weather.com.cn/weather/101120906.shtml'
+        r = requests.get(self.current_weather_api)
         r.encoding= 'utf-8'
         orignal_list = re.findall(r'<h1>(\d{1,2}日.+)</h1>\n<big class="png.+"></big>\n<big class="png.+"></big>\n<p title=".+" class=".+">(.+)</p>\n<p class="tem">\n([\s\S+]+?)\n</p>\n<p class="win">\n<em>\n([\s\S]+?)</em>\n<i>(.+)</i>', r.text)
         wea_list = []
