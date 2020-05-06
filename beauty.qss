@@ -45,14 +45,14 @@ QScrollBar:horizontal {
     margin: 0 0 0 0;
 }
 QScrollBar::handle:horizontal {
-    background: grey;
+    background: #dddddd;
     min-width: 10px;
     border: 5px solid #f1f3f4;
     border-radius: 10px;
     background-attachment: fixed;
 }
 QScrollBar::handle:horizontal:hover {
-    background: #5ACEBE;
+    background: grey;
 }
 QScrollBar::add-line:horizontal {
     background: url(pngs/next_gray.png);
