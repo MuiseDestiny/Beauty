@@ -33,6 +33,12 @@ QScrollArea {
     border: 0px;
     background-attachment: scroll;
 }
+QScrollBar::add-page:horizontal {
+    background: #f1f3f4;
+}
+QScrollBar::sub-page:horizontal {
+    background: #f1f3f4;
+}
 QScrollBar:horizontal {
     background: #f1f3f4;
     height: 20px;
@@ -47,12 +53,6 @@ QScrollBar::handle:horizontal {
 }
 QScrollBar::handle:horizontal:hover {
     background: #5ACEBE;
-}
-QScrollBar::add-page:horizontal {
-    background: #f1f3f4;
-}
-QScrollBar::sub-page:horizontal {
-    background: red;
 }
 QScrollBar::add-line:horizontal {
     background: url(pngs/next_gray.png);

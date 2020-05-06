@@ -3,7 +3,7 @@ from PIL import Image
 from PyQt5.Qt import *
 import requests
 from datetime import datetime
-from QssTool import QssTool
+from Qss import QssTool
 from io import BytesIO
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QGraphicsOpacityEffect
