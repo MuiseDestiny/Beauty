@@ -264,7 +264,7 @@ class Beauty(QWidget):
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
         self.input_btn.setIcon(QIcon('pngs/scope.png'))
         self.input_edit.addAction(self.input_btn, self.input_edit.TrailingPosition)
-        self.input_btn.setShortcut('Enter')
+        self.input_btn.setShortcut(Qt.Key_Enter)
         self.input_btn.triggered.connect(self.update_data)
         # 添加到垂直布局
         self.v_box.addWidget(self.title, alignment=Qt.AlignCenter)
@@ -412,6 +412,7 @@ class Beauty(QWidget):
         """
         for box in self.frame_list:
             box.hide()
+        self.frame_list = []
         for i in range(7):
             self.next_index = i
             frame = self.product_frame()
@@ -424,7 +425,6 @@ class Beauty(QWidget):
         """
         天气获取，用正则，也可用xpath，没必要
         """
-        self.current_weather_api = 'http://www.weather.com.cn/weather/101120906.shtml'
         r = requests.get(self.current_weather_api)
         r.encoding= 'utf-8'
         orignal_list = re.findall(r'<h1>(\d{1,2}日.+)</h1>\n<big class="png.+"></big>\n<big class="png.+"></big>\n<p title=".+" class=".+">(.+)</p>\n<p class="tem">\n([\s\S+]+?)\n</p>\n<p class="win">\n<em>\n([\s\S]+?)</em>\n<i>(.+)</i>', r.text)
@@ -438,6 +438,7 @@ class Beauty(QWidget):
             wea_dict['wind_info'] = wea[4]
             wea_list.append(wea_dict)
         self.weather_list = wea_list
+        print(self.weather_list)
 
     def suggestion_location(self):
         """
