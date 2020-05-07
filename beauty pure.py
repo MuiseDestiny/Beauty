@@ -161,8 +161,8 @@ class AddClickFrame(QObject):
         v_box.addWidget(close_btn, alignment=Qt.AlignCenter)
         title = QLabel()
         title.setAlignment(Qt.AlignCenter)
-        title.setText("<font color=#fa744f style='font-size: 30px;font-weight: bold;'>Almanac</font>")
-        v_box.addWidget(title, alignment=Qt.AlignCenter|Qt.AlignBottom)
+        title.setText("<font color=#fa744f style='font-size: 30px;'>Almanac</font>")
+        v_box.addWidget(title, alignment=Qt.AlignCenter)
         # icon
         h_box = QHBoxLayout()
         yi_icon = QLabel()
