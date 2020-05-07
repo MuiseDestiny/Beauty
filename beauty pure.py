@@ -10,11 +10,13 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QGraphicsOpacityEffect
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import datetime
 import sys
 import random
 import re
 import os
-
+# 设置工作路径，删除可运行
+os.chdir(r'F:\python\可视化GUI\Beauty')
 
 class MyFrame(QFrame):
     enter_signal = pyqtSignal()
@@ -117,6 +119,109 @@ class UpdatePic(QThread):
             return img.crop((0, 0, hh * self.scale, hh))
         elif ori_scale < self.scale:
             return img.crop((0, 0, ww, ww / self.scale))
+
+class AddClickFrame(QObject):
+    api = 'http://tools.2345.com/api/almanac/{}/{}.js'
+
+    def __init__(self, obj):
+        super().__init__()
+        # get data from an api from 2345
+        self.obj = obj
+        self.init_api()
+        self.get_info()
+        self.init_frame()
+        self.init_animation()
+
+    def init_api(self):
+        day = datetime.datetime.now() + datetime.timedelta(days=int(self.obj.property('number')))
+        self.api = self.api.format(day.year, day.strftime('%Y-%m-%d'))
+
+    def get_info(self):
+        self.data =  eval(requests.get(self.api).text[14:-2])
+
+    def init_frame(self):
+        self.add_frame = QLabel(self.obj)
+        self.add_frame.setObjectName('add_frame')
+        self.add_frame.setStyleSheet("""#add_frame {
+                                        background: #fafafa;
+                                        color: black;
+                                        border: 3px solid #f1f3f4;
+                                        border-top-left-radius: 20px;
+                                        border-top-right-radius: 20px;}""")
+        self.add_frame.setGeometry(QRect(0, 300, 300, 0))
+        self.init_ui()
+        self.add_frame.show()
+
+    def init_ui(self):
+        v_box = QVBoxLayout()
+        close_btn = QPushButton()
+        close_btn.pressed.connect(self.exit_frame)
+        close_btn.setStyleSheet('background: url(pngs/close.png);border: 0px;width: 30px;height: 30px;')
+        close_btn.setFlat(True)
+        v_box.addWidget(close_btn, alignment=Qt.AlignCenter)
+        title = QLabel()
+        title.setAlignment(Qt.AlignCenter)
+        title.setText("<font color=#fa744f style='font-size: 30px;font-weight: bold;'>Almanac</font>")
+        v_box.addWidget(title, alignment=Qt.AlignCenter|Qt.AlignBottom)
+        # icon
+        h_box = QHBoxLayout()
+        yi_icon = QLabel()
+        yi_icon.setText("<img src='pngs/yi.png'></img>")
+        ji_icon = QLabel()
+        ji_icon.setText("<img src='pngs/ji.png'></img>")
+        h_box.addWidget(yi_icon, alignment=Qt.AlignCenter)
+        h_box.addWidget(ji_icon, alignment=Qt.AlignCenter)
+        v_box.addLayout(h_box)
+        # yi ji文字
+        h_box = QHBoxLayout()
+        yi_moudle = "<font color=teal style='font-size: 18px;font-weight: bold;'>{}</font>"
+        ji_moudle = "<font color=deeppink style='font-size: 18px;font-weight: bold;'>{}</font>"
+        yi_list = self.data['day']['yi'].split()[:6] if len(self.data['day']['yi'].split()) >= 6 else self.data['day']['yi'].split()
+        ji_list = self.data['day']['ji'].split()[:6] if len(self.data['day']['ji'].split()) >= 6 else self.data['day']['ji'].split()
+        left_label = QLabel('<br></br>'.join([yi_moudle.format(i) for i in yi_list]))
+        right_label = QLabel('<br></br>'.join([ji_moudle.format(i) for i in ji_list]))
+        left_label.setAlignment(Qt.AlignCenter)
+        right_label.setAlignment(Qt.AlignCenter)
+        # 细节处理
+        left_v_box = QVBoxLayout()
+        left_v_box.addWidget(left_label, alignment=Qt.AlignTop|Qt.AlignCenter)
+        left_label_bg = QLabel()
+        left_label_bg.setFixedWidth(120)
+        left_label_bg.setFixedHeight(200)
+        left_label_bg.setLayout(left_v_box)
+        left_label_bg.setContentsMargins(0, 0, 10, 0)
+        right_v_box = QVBoxLayout()
+        right_v_box.addWidget(right_label, alignment=Qt.AlignTop|Qt.AlignCenter)
+        right_label_bg = QLabel()
+        right_label_bg.setFixedWidth(120)
+        right_label_bg.setFixedHeight(200)
+        right_label_bg.setLayout(right_v_box)
+        right_label_bg.setContentsMargins(10, 0, 0, 0)
+        # 细节处理
+        h_box.addWidget(left_label_bg, alignment=Qt.AlignTop|Qt.AlignCenter)
+        h_box.addWidget(right_label_bg, alignment=Qt.AlignTop|Qt.AlignCenter)
+        yi_ji_bg = QLabel()
+        yi_ji_bg.setFixedWidth(270)
+        yi_ji_bg.setFixedHeight(200)
+        yi_ji_bg.setContentsMargins(0, 0, 0, 0)
+        yi_ji_bg.setLayout(h_box)
+        v_box.addWidget(yi_ji_bg, alignment=Qt.AlignCenter)
+        self.add_frame.setLayout(v_box)
+
+    def exit_frame(self):
+        self.add_anim.setDirection(QAbstractAnimation.Backward)
+        self.add_anim.start()
+
+    def init_animation(self):
+        self.add_anim = QPropertyAnimation(self.add_frame, b'geometry')
+        self.add_anim.setDuration(450)
+        self.add_anim.setStartValue(QRect(0, 350, 300, 0))
+        self.add_anim.setEndValue(QRect(0, 0, 300, 350))
+        self.add_anim.setEasingCurve(QEasingCurve.InOutCubic)
+        print(dir(QEasingCurve))
+
+    def start(self):
+        self.add_anim.start()
 
 
 class SeriesAnimation(QParallelAnimationGroup):
@@ -280,7 +385,8 @@ class Beauty(QWidget):
         for key in self.params.keys():
             self.params[key] = {
                 'class': None,
-                'style': None
+                'style': None,
+                'add_frame': None
             }
         self.title.setText("<font color=#fa744f style='font-size: 40px;font-weight: bold;'>W</font>"
                            "<font color=#16817a style='font-size: 40px;font-weight: bold;'>e</font>"
@@ -326,6 +432,10 @@ class Beauty(QWidget):
         return color
 
     def eventFilter(self, obj, event):
+        if obj == self.title:
+            if event.type() == QEvent.MouseButtonDblClick:
+                if event.button() == Qt.LeftButton:
+                    print('方法未实现')
         return super().eventFilter(obj, event)
 
     def change_pic(self, obj):
@@ -460,7 +570,6 @@ class Beauty(QWidget):
         self.h_box.setSpacing(100)
         self.figure.update_figure(high_low_list)
         # 添加最高最低布局
-        print(self.h_box_bg.width())
         self.h_box_bg.setLayout(self.h_box)
 
     def get_weather(self):
@@ -539,12 +648,12 @@ class Beauty(QWidget):
         self.params[i]['class'] = SeriesAnimation(obj, False, 20, 5, self, i)
         self.params[obj.property('number')]['class'].start()
 
-    @staticmethod
-    def add_click(obj):
+    def add_click(self, obj):
         """
-        加号逻辑尚未实现
+        点击加号显示黄历
         """
-        print('此按钮纯属摆设')
+        self.params[obj.property('number')]['add_frame'] = AddClickFrame(obj)
+        self.params[obj.property('number')]['add_frame'].start()
 
     def save(self):
         """
