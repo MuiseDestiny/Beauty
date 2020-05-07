@@ -103,11 +103,12 @@ class UpdatePic(QThread):
             return
         api = random.choice(self.api_list)
         try:
-            res = requests.get(api, headers=self.headers, timeout=5)
+            res = requests.get(api, headers=self.headers, timeout=3)
             img = self.clip_img(Image.open(BytesIO(res.content)))
             img = img.resize((self.pic_w, self.pic_h))
             img.save(self.filepath)
             self.download_finish.emit()
+            return
         except Exception as e:
             print(e)
             return self.run()
@@ -122,6 +123,7 @@ class UpdatePic(QThread):
 
 class AddClickFrame(QObject):
     api = 'http://tools.2345.com/api/almanac/{}/{}.js'
+    flag = False
 
     def __init__(self, obj):
         super().__init__()
@@ -209,6 +211,7 @@ class AddClickFrame(QObject):
         self.add_frame.setLayout(v_box)
 
     def exit_frame(self):
+        self.flag = False
         self.add_anim.setDirection(QAbstractAnimation.Backward)
         self.add_anim.start()
 
@@ -218,9 +221,9 @@ class AddClickFrame(QObject):
         self.add_anim.setStartValue(QRect(0, 350, 300, 0))
         self.add_anim.setEndValue(QRect(0, 0, 300, 350))
         self.add_anim.setEasingCurve(QEasingCurve.InOutCubic)
-        print(dir(QEasingCurve))
 
     def start(self):
+        self.flag = True
         self.add_anim.start()
 
 
@@ -435,7 +438,30 @@ class Beauty(QWidget):
         if obj == self.title:
             if event.type() == QEvent.MouseButtonDblClick:
                 if event.button() == Qt.LeftButton:
-                    print('方法未实现')
+                    state = []
+                    for data in self.params.values():
+                        if data['add_frame'] is None or not data['add_frame'].flag:
+                            state.append(0)
+                        else:
+                            state.append(1)
+                    print(state)
+                    print('判断总共开着的{}'.format(sum(state)))
+                    if sum(state) > 3:
+                        for data in self.params.values():
+                            print('进入')
+                            if data['add_frame'] is None:
+                                continue
+                            if data['add_frame'].flag:
+                                data['add_frame'].exit_frame()
+                    else:
+                        print('else ' + str(sum(state)))
+                        for i, data in enumerate(self.params.values()):
+                            if data['add_frame'] is None:
+                                data['add_frame'] = AddClickFrame(self.frame_list[i])
+                                data['add_frame'].start()
+                            else:
+                                data['add_frame'].start()
+
         return super().eventFilter(obj, event)
 
     def change_pic(self, obj):
@@ -446,7 +472,8 @@ class Beauty(QWidget):
         try:
             filename = obj.property('number')
             self.update_pic = UpdatePic(filename)
-            self.update_pic.download_finish.connect(lambda: obj.setStyleSheet(""".MyFrame[number='{}']:hover
+            self.update_pic.download_finish.connect(lambda: obj.setStyleSheet(
+            """.MyFrame[number='{}']:hover
             {{background: url('pngs/{}.jpg');}}
             {}""".format(filename, filename, self.params[filename]['style'])))
             self.update_pic.start()
@@ -546,7 +573,7 @@ class Beauty(QWidget):
                         x1:0,y1:0,x2:0,y2:1,
                         stop:0 rgb{},
                         stop:0.6 rgb{},
-                        stop:1 rgb{});}}""".format(self.card_index + 1,
+                        stop:1 rgb{});}}""".format(self.card_index,
                         self.tem_to_color(low_tem), self.tem_to_color(high_tem),
                         self.tem_to_color(high_tem))
         self.params[str(self.card_index)]['style'] = fore_style
