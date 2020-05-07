@@ -224,6 +224,7 @@ class AddClickFrame(QObject):
 
     def start(self):
         self.flag = True
+        self.add_anim.setDirection(QAbstractAnimation.Forward)
         self.add_anim.start()
 
 
@@ -444,22 +445,19 @@ class Beauty(QWidget):
                             state.append(0)
                         else:
                             state.append(1)
-                    print(state)
-                    print('判断总共开着的{}'.format(sum(state)))
                     if sum(state) > 3:
                         for data in self.params.values():
-                            print('进入')
                             if data['add_frame'] is None:
                                 continue
                             if data['add_frame'].flag:
                                 data['add_frame'].exit_frame()
                     else:
-                        print('else ' + str(sum(state)))
                         for i, data in enumerate(self.params.values()):
                             if data['add_frame'] is None:
                                 data['add_frame'] = AddClickFrame(self.frame_list[i])
                                 data['add_frame'].start()
                             else:
+                                # data['add_frame'] = AddClickFrame(self.frame_list[i])
                                 data['add_frame'].start()
 
         return super().eventFilter(obj, event)
