@@ -239,7 +239,7 @@ class Beauty(QWidget):
         self.scroll_area = QScrollArea()
         self.h_box = QGridLayout()
         self.h_box_bg = QLabel()
-        self.figure = LineAnimation(self.h_box_bg, 15, 3, 180)
+        self.figure = LineAnimation(self.h_box_bg, 13.5, 2.5, 200)
         self.v_box = QVBoxLayout()
         self.title = QLabel()
         self.title.installEventFilter(self)
@@ -455,9 +455,10 @@ class Beauty(QWidget):
             high_low_list.append([low_tem, high_tem])
             self.h_box.addWidget(frame, 0, i)
             self.frame_list.append(frame)
-        self.h_box.setSpacing(100)
+        # self.h_box.setSpacing(100)
         self.figure.update_figure(high_low_list)
         # 添加最高最低布局
+        print(self.h_box_bg.width())
         self.h_box_bg.setLayout(self.h_box)
 
     def get_weather(self):
@@ -477,7 +478,6 @@ class Beauty(QWidget):
             wea_dict['wind_info'] = wea[4]
             wea_list.append(wea_dict)
         self.weather_list = wea_list
-        print(self.weather_list)
 
     def suggestion_location(self):
         """
