@@ -456,10 +456,10 @@ class Beauty(QWidget):
                             if data['add_frame'] is None:
                                 data['add_frame'] = AddClickFrame(self.frame_list[i])
                                 data['add_frame'].start()
+                            elif data['add_frame'].flag:
+                                continue
                             else:
-                                # data['add_frame'] = AddClickFrame(self.frame_list[i])
                                 data['add_frame'].start()
-
         return super().eventFilter(obj, event)
 
     def change_pic(self, obj):
