@@ -239,7 +239,9 @@ class Beauty(QWidget):
         self.scroll_area = QScrollArea()
         self.h_box = QGridLayout()
         self.h_box_bg = QLabel()
-        self.figure = LineAnimation(self.h_box_bg, 13.5, 2.5, 200)
+        # 长2700
+        dpi = 200
+        self.figure = LineAnimation(self.h_box_bg, 2700/dpi, 500/dpi, dpi)
         self.v_box = QVBoxLayout()
         self.title = QLabel()
         self.title.installEventFilter(self)
@@ -383,12 +385,12 @@ class Beauty(QWidget):
             h_box.addWidget(start_direction, alignment=Qt.AlignCenter)
             h_box.addWidget(end_direction, alignment=Qt.AlignCenter)
             h_box.setContentsMargins(80, 0, 80, 0)
-            wind_info = QLabel(
-                "<font color='white' style='font-size: 20px;'>{}</font>".format('转'.join(data['wind'])))  # 风描述
+
         else:
             now_direction = QLabel("<img src='pngs/{}.png'></img>".format(data['wind'][0]))
             h_box.addWidget(now_direction, alignment=Qt.AlignCenter)
-            wind_info = QLabel("<font color='white' style='font-size: 20px;'>{}</font>".format(data['wind'][0]))  # 风描述
+        wind_info = QLabel(
+            "<font color='white' style='font-size: 20px;'>{}</font>".format(data['wind_info'].replace('<', '&lt;')))  # 风描述
         # 下面的时间
         day_text = data['day'].replace('）', '').split('日（')[1]
         day_number = data['day'].split('日')[0]
@@ -455,7 +457,7 @@ class Beauty(QWidget):
             high_low_list.append([low_tem, high_tem])
             self.h_box.addWidget(frame, 0, i)
             self.frame_list.append(frame)
-        # self.h_box.setSpacing(100)
+        self.h_box.setSpacing(100)
         self.figure.update_figure(high_low_list)
         # 添加最高最低布局
         print(self.h_box_bg.width())
@@ -478,6 +480,7 @@ class Beauty(QWidget):
             wea_dict['wind_info'] = wea[4]
             wea_list.append(wea_dict)
         self.weather_list = wea_list
+        print(wea_list)
 
     def suggestion_location(self):
         """
