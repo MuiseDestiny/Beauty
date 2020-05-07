@@ -7,6 +7,9 @@ from Qss import QssTool
 from io import BytesIO
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QGraphicsOpacityEffect
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import sys
 import random
 import re
@@ -178,6 +181,37 @@ class SeriesAnimation(QParallelAnimationGroup):
         self.right_opacity_anim.setEndValue(0.999 if self.is_up else 0)
         self.right_opacity_anim.setEasingCurve(QEasingCurve.InCurve)
 
+class LineAnimation(FigureCanvas):
+
+    def __init__(self, parent, width, height, dpi):
+        plt.rcParams['axes.facecolor'] = '#f1f3f4'
+        plt.rcParams['figure.facecolor'] = '#f1f3f4'
+        # We want the axes cleared every time plot() is called
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        self.fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        # We want the axes cleared every time plot() is called
+        self.canvas = FigureCanvas(self.fig)
+        self.canvas.setParent(parent)
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        self.canvas.updateGeometry()
+
+    def update_figure(self, data):
+        self.axes.cla()
+        high_list = [max([int(j) for j in i]) for i in data]
+        low_list = [min([int(j) for j in i]) for i in data]
+        self.axes.plot([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5],
+                        high_list,
+                        color='#eb6383')
+        self.axes.plot([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5],
+                        low_list,
+                        color='#58b4ae')
+        self.axes.set_xlim(0, 7)
+        self.axes.set_ylim(-10, 40)
+        self.axes.axis(False)
+        self.canvas.draw()
+
 
 class Beauty(QWidget):
     weather_list = []
@@ -202,9 +236,10 @@ class Beauty(QWidget):
         self.setFixedWidth(1200)
         self.setFixedHeight(745)
         self.setObjectName('win')
-        self.scroll = QScrollArea()
+        self.scroll_area = QScrollArea()
         self.h_box = QGridLayout()
         self.h_box_bg = QLabel()
+        self.figure = LineAnimation(self.h_box_bg, 15, 3, 180)
         self.v_box = QVBoxLayout()
         self.title = QLabel()
         self.title.installEventFilter(self)
@@ -231,8 +266,8 @@ class Beauty(QWidget):
         # 更新天气数据
         self.update_data()
         # 水平滑条
-        self.scroll.setWidget(self.h_box_bg)
-        self.v_box.addWidget(self.scroll)
+        self.scroll_area.setWidget(self.h_box_bg)
+        self.v_box.addWidget(self.scroll_area)
         # 设定布局
         self.setLayout(self.v_box)
 
@@ -272,8 +307,8 @@ class Beauty(QWidget):
         self.v_box.setSpacing(20)
         self.v_box.setContentsMargins(45, 50, 45, 50)
         self.setLayout(self.v_box)
-        # 步长
-        self.scroll.setHorizontalScrollBar(self.sb)
+        # 滚动区域
+        self.scroll_area.setHorizontalScrollBar(self.sb)
         self.sb.setSingleStep(400)
         self.sb.setPageStep(400)
         # 应用布局 美化
@@ -310,7 +345,7 @@ class Beauty(QWidget):
         """
         parent就是底层frame, 在上面添加小部件
         """
-        data = self.weather_list[self.next_index]
+        data = self.weather_list[self.card_index]
         v_box = QVBoxLayout()
         day_weather = data['weather'].split('转') if '转' in data['weather'] else [''] + [data['weather']]
         wea_morning = QLabel(
@@ -382,7 +417,7 @@ class Beauty(QWidget):
         用来生产一个frame，并将frame默认背景色根据温度产生渐变
         """
         frame = MyFrame()
-        frame.setProperty('number', str(self.next_index))
+        frame.setProperty('number', str(self.card_index))
         frame.enter_signal.connect(lambda: self.enter_anim(frame))
         frame.leave_signal.connect(lambda: self.leave_anim(frame))
         frame.setObjectName('frame_box')
@@ -399,12 +434,12 @@ class Beauty(QWidget):
                         x1:0,y1:0,x2:0,y2:1,
                         stop:0 rgb{},
                         stop:0.6 rgb{},
-                        stop:1 rgb{});}}""".format(self.next_index + 1,
+                        stop:1 rgb{});}}""".format(self.card_index + 1,
                         self.tem_to_color(low_tem), self.tem_to_color(high_tem),
                         self.tem_to_color(high_tem))
-        self.params[str(self.next_index)]['style'] = fore_style
+        self.params[str(self.card_index)]['style'] = fore_style
         frame.setStyleSheet(fore_style)
-        return frame
+        return frame, low_tem, high_tem
 
     def init_frame_box(self):
         """
@@ -413,12 +448,16 @@ class Beauty(QWidget):
         for box in self.frame_list:
             box.hide()
         self.frame_list = []
+        high_low_list = []
         for i in range(7):
-            self.next_index = i
-            frame = self.product_frame()
+            self.card_index = i
+            frame, low_tem, high_tem = self.product_frame()
+            high_low_list.append([low_tem, high_tem])
             self.h_box.addWidget(frame, 0, i)
             self.frame_list.append(frame)
         self.h_box.setSpacing(100)
+        self.figure.update_figure(high_low_list)
+        # 添加最高最低布局
         self.h_box_bg.setLayout(self.h_box)
 
     def get_weather(self):
@@ -433,7 +472,7 @@ class Beauty(QWidget):
             wea_dict = {}
             wea_dict['day'] = wea[0]
             wea_dict['weather'] = wea[1]
-            wea_dict['temperate'] = ' to '.join(re.findall('\d{1,2}℃', wea[2]))
+            wea_dict['temperate'] = '℃ to '.join(re.findall('(\d{1,2})℃*', wea[2])) + '℃'
             wea_dict['wind'] = re.findall('title="(.{,6})"', wea[3])
             wea_dict['wind_info'] = wea[4]
             wea_list.append(wea_dict)
