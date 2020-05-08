@@ -14,7 +14,7 @@
 `文件说明`
 
 1. Beauty/pngs 存放icon等资源
-2. Beauty/beauty pure.py 主要代码
+2. Beauty/beauty.py 主要代码
 3. Beauty/Qss.py 设置StyleSheet用作与代码分离
 4. Beauty/beauty.qss qss代码
 
