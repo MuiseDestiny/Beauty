@@ -456,6 +456,7 @@ class Beauty(QWidget):
                             if data['add_frame'] is None:
                                 data['add_frame'] = AddClickFrame(self.frame_list[i])
                                 data['add_frame'].start()
+
                             elif data['add_frame'].flag:
                                 continue
                             else:
@@ -584,6 +585,8 @@ class Beauty(QWidget):
         """
         for box in self.frame_list:
             box.hide()
+        for data in self.params.values():
+            data['add_frame'] = None
         self.frame_list = []
         high_low_list = []
         for i in range(7):
