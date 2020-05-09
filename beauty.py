@@ -61,7 +61,6 @@ class MyPushButton(QPushButton):
 
     @opacity.setter
     def opacity(self, o):
-        # self.opacity_op = QGraphicsOpacityEffect(self)
         self.opacity_op.setOpacity(o)
         self.setGraphicsEffect(self.opacity_op)
         self._opacity = o
@@ -249,7 +248,6 @@ class SeriesAnimation(QParallelAnimationGroup):
         self.init_opacity_anim_left(self.obj.findChild(MyPushButton, 'Left'))
         # 创建动画组
         self.addAnimation(self.up_down_anim)
-
         self.addAnimation(self.right_opacity_anim)
         self.addAnimation(self.left_opacity_anim)
         self.addAnimation(self.shadow_anim)
@@ -275,7 +273,7 @@ class SeriesAnimation(QParallelAnimationGroup):
     def init_opacity_anim_left(self, obj):
         self.left_opacity_anim = QPropertyAnimation()
         self.left_opacity_anim.setTargetObject(obj)
-        self.left_opacity_anim.setDuration(self.dur)  # 一次循环时间
+        self.left_opacity_anim.setDuration(self.dur)
         self.left_opacity_anim.setPropertyName(b'opacity')
         self.left_opacity_anim.setStartValue(obj._opacity)
         self.left_opacity_anim.setEndValue(0.999 if self.is_up else 0)
@@ -284,22 +282,20 @@ class SeriesAnimation(QParallelAnimationGroup):
     def init_opacity_anim_right(self, obj):
         self.right_opacity_anim = QPropertyAnimation()
         self.right_opacity_anim.setTargetObject(obj)
-        self.right_opacity_anim.setDuration(self.dur)  # 一次循环时间
+        self.right_opacity_anim.setDuration(self.dur)
         self.right_opacity_anim.setPropertyName(b'opacity')
         self.right_opacity_anim.setStartValue(obj._opacity)
         self.right_opacity_anim.setEndValue(0.999 if self.is_up else 0)
         self.right_opacity_anim.setEasingCurve(QEasingCurve.InCurve)
 
-class LineAnimation(FigureCanvas):
+class TemLine(FigureCanvas):
 
     def __init__(self, parent, width, height, dpi):
         plt.rcParams['axes.facecolor'] = '#f1f3f4'
         plt.rcParams['figure.facecolor'] = '#f1f3f4'
-        # We want the axes cleared every time plot() is called
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         self.fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
-        # We want the axes cleared every time plot() is called
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(parent)
         self.canvas.setSizePolicy(QSizePolicy.Expanding,
@@ -323,21 +319,15 @@ class LineAnimation(FigureCanvas):
 
 
 class Beauty(QWidget):
-    weather_list = []
-    frame_list = []
-    frame_history_list = []
-    next_index = 0
+    weather_list = []  # 每一天天气列表
+    frame_list = []  # 收纳所有卡片方便更新时隐藏
+    frame_index = 0  # 当前处理卡片的索引
     current_suggest_api = ''
     current_weather_api = ''
-    is_finish = True
     update_pic = None
-    anim_thread_dict = {}
-    anim_thread = None
-    params = dict.fromkeys([str(i) for i in range(7)])
-    number_key = None
-    timer = None
-    suggest_api = 'http://toy1.weather.com.cn/search?cityname='
-    weather_api = 'http://www.weather.com.cn/weather/{}.shtml'
+    params = dict.fromkeys([str(i) for i in range(7)])  # 记录
+    suggest_api = 'http://toy1.weather.com.cn/search?cityname='  # 联想api
+    weather_api = 'http://www.weather.com.cn/weather/{}.shtml'  # 中央天气网首页
 
     def __init__(self):
         super().__init__()
@@ -350,7 +340,7 @@ class Beauty(QWidget):
         self.h_box_bg = QLabel()
         # 长2700
         dpi = 200
-        self.figure = LineAnimation(self.h_box_bg, 2700/dpi, 500/dpi, dpi)
+        self.figure = TemLine(self.h_box_bg, 2700/dpi, 500/dpi, dpi)
         self.v_box = QVBoxLayout()
         self.title = QLabel()
         self.title.installEventFilter(self)
