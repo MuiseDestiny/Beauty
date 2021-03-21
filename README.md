@@ -6,6 +6,10 @@
 更新web版本
 http://muise.icu
 服务器只有一个月，可能一个月后无法访问
+![](https://ae01.alicdn.com/kf/U80b163892b7c4f8cbe5ea0eb5e69380fc.jpg)
+![](https://ae01.alicdn.com/kf/Uc87ed203bb23414287186dfd9fe748074.jpg)
+![](https://ae01.alicdn.com/kf/Udfffe33b425741ee922e95328b552dd3X.jpg)
+![](https://ae01.alicdn.com/kf/U5262d6d577754787adf8512efdcf7d30R.jpg)
 
 ## 弃坑
 学习~
