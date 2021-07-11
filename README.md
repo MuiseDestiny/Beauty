@@ -1,5 +1,4 @@
 # Beauty | weather | PyQt5
-> Design for BNU interview.
 
 > 数据来自中央天气网，灵感来自互联网。
 
